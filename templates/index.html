@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze spill</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<!-- Legg dette rett over <div id="maze"> -->
+<div id="name-screen" style="text-align: center; margin-bottom: 15px;">
+    <input type="text" id="username-input" placeholder="Skriv navnet ditt her..." style="padding: 8px; border-radius: 5px; border: 1px solid #4caf50;">
+    <button onclick="saveName()" style="padding: 8px 15px; border-radius: 5px; background: #4caf50; color: white; border: none; cursor: pointer;">Start</button>
+</div>
+
+<!-- Her vil navnet ditt dukke opp over spillet -->
+<h2 id="display-name" style="text-align: center; color: #4caf50; display: none;"></h2>
+
+
+
+
+  <div id="timer"> time: 30</div> 
+ <div id="maze-container">
+    <div id="maze"></div>
+    <div id="player"></div>
+ </div>
+
+ <div id="controls">
+    <button class="control-btn" id="up" onclick="movePlayer('up')">↑</button>
+    <button class="control-btn" id="left" onclick="movePlayer('left')">←</button>
+    <button class="control-btn" id="right" onclick="movePlayer('right')">→</button>
+    <button class="control-btn" id="down" onclick="movePlayer('down')">↓</button>
+
+</div>
+
+    <div id="leaderboard-screen" style="display: none; text-align: center; font-family: sans-serif; background: #222; color: #fff; padding: 30px; border-radius: 12px; max-width: 400px; margin: 20px auto; border: 2px solid #4caf50;">
+        <h2 style="color: #4caf50; font-size: 26px; margin-bottom: 20px;">🏆 HALL OF FAME 🏆</h2>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 2px solid #4caf50; color: #888;">
+                    <th style="padding: 10px;">Plass</th>
+                    <th style="padding: 10px;">Spiller</th>
+                    <th style="padding: 10px; text-align: right;">Tid igjen</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-table-body">
+                <!-- Tidene mønstrer seg feilfritt inn her via JavaScript! -->
+            </tbody>
+        </table>
+        
+        <button onclick="backToGame()" style="padding: 10px 20px; font-size: 16px; font-weight: bold; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer;">Spill Igjen</button>
+    </div>
+<div id="message">
+    <h2 id="message-text"></h2>
+    <button id="try-again" onclick="initGame()">try again</button>
+</div>
+
+
+
+
+
+
+ <script src="/static/script.js"></script>
+  
+</body>
+</html>
