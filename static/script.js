@@ -6,6 +6,8 @@ let timeLeft = 30;
 let maze;
 let exitPos;
 let gameActive;
+let moveCount = 0;
+let secretWallsPassed = 0;
 
 function generateMaze() {
     maze = Array(MAZE_SIZE)
@@ -165,54 +167,59 @@ function updatePlayerPosition() {
 
 function movePlayer(direction) {
     if (!gameActive) return;
-    
+
     const x = player.x;
     const y = player.y;
     const walls = maze[y][x].walls;
-    
-    // Henter HTML-elementene for cellen du står i, og cellene rundt deg
+
     const currentCell = document.querySelector(`#maze .cell:nth-child(${y * MAZE_SIZE + x + 1})`);
-    
+
     switch (direction) {
         case "up":
-            // Henter nabocellen over deg for å sjekke om veggen derfra er hemmelig
             const nextCellUp = y > 0 ? document.querySelector(`#maze .cell:nth-child(${(y - 1) * MAZE_SIZE + x + 1})`) : null;
             const topWall = currentCell ? currentCell.querySelector(".wall.top") : null;
             const nextBottomWall = nextCellUp ? nextCellUp.querySelector(".wall.bottom") : null;
-            
-            // ELITE-HACKET: Du kan gå hvis det ikke er vegg, ELLER hvis veggen på en av sidene er secret!
+
             if (!walls.top || (topWall && topWall.classList.contains("secret")) || (nextBottomWall && nextBottomWall.classList.contains("secret"))) {
                 player.y--;
+                moveCount++;
+                if (walls.top) secretWallsPassed++;
             }
             break;
-            
+
         case "down":
             const nextCellDown = y < MAZE_SIZE - 1 ? document.querySelector(`#maze .cell:nth-child(${(y + 1) * MAZE_SIZE + x + 1})`) : null;
             const bottomWall = currentCell ? currentCell.querySelector(".wall.bottom") : null;
             const nextTopWall = nextCellDown ? nextCellDown.querySelector(".wall.top") : null;
-            
+
             if (!walls.bottom || (bottomWall && bottomWall.classList.contains("secret")) || (nextTopWall && nextTopWall.classList.contains("secret"))) {
                 player.y++;
+                moveCount++;
+                if (walls.bottom) secretWallsPassed++;
             }
             break;
-            
+
         case "left":
             const nextCellLeft = x > 0 ? document.querySelector(`#maze .cell:nth-child(${y * MAZE_SIZE + (x - 1) + 1})`) : null;
             const leftWall = currentCell ? currentCell.querySelector(".wall.left") : null;
             const nextRightWall = nextCellLeft ? nextCellLeft.querySelector(".wall.right") : null;
-            
+
             if (!walls.left || (leftWall && leftWall.classList.contains("secret")) || (nextRightWall && nextRightWall.classList.contains("secret"))) {
                 player.x--;
+                moveCount++;
+                if (walls.left) secretWallsPassed++;
             }
             break;
-            
+
         case "right":
             const nextCellRight = x < MAZE_SIZE - 1 ? document.querySelector(`#maze .cell:nth-child(${y * MAZE_SIZE + (x + 1) + 1})`) : null;
             const rightWall = currentCell ? currentCell.querySelector(".wall.right") : null;
             const nextLeftWall = nextCellRight ? nextCellRight.querySelector(".wall.left") : null;
-            
+
             if (!walls.right || (rightWall && rightWall.classList.contains("secret")) || (nextLeftWall && nextLeftWall.classList.contains("secret"))) {
                 player.x++;
+                moveCount++;
+                if (walls.right) secretWallsPassed++;
             }
             break;
     }
@@ -230,6 +237,8 @@ function initGame() {
     clearInterval(timer);
     gameActive = true;
     timeLeft = 30;
+    moveCount = 0;
+    secretWallsPassed = 0;
     document.getElementById("timer").textContent = `Timer: ${timeLeft}`;
     document.getElementById("message").style.display = "none";
     player = { x: 0, y: 0 };
@@ -340,6 +349,8 @@ async function showLeaderboardScreen() {
         row.innerHTML = `
             <td style="padding: 12px; color: ${index === 0 ? '#4caf50' : '#fff'};">#${index + 1}</td>
             <td style="padding: 12px;">${entry.name}</td>
+            <td style="padding: 12px;">${entry.moves ?? 0}</td>
+            <td style="padding: 12px;">${entry.secret_walls ?? 0}</td>
             <td style="padding: 12px; text-align: right; color: #4caf50;">${entry.time}s</td>
         `;
         tableBody.appendChild(row);
@@ -362,7 +373,7 @@ async function saveScore(playerTime) {
     await fetch("/api/scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: playerName, time: playerTime })
+       body: JSON.stringify({ name: playerName, time: playerTime, moves: moveCount, secret_walls: secretWallsPassed })
     });
 
     setTimeout(() => {
